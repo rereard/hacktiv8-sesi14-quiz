@@ -17,7 +17,8 @@ import {
   useColorScheme,
   View,
   TextInput,
-  TouchableOpacity
+  TouchableOpacity,
+  Image
 } from 'react-native';
 
 /* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
@@ -26,21 +27,25 @@ import {
 const App: () => Node = () => {
   const [data, setData] = useState([])
   const [textValue, setTextValue] = useState('')
+  const [secondText, setSecondText] = useState('')
   const [edit, setEdit] = useState({})
   const editData = (data) => {
     setEdit(data)
     setTextValue(data.value)
+    setSecondText(data.value2)
   }
   const cancelEditData = () => {
     setEdit({})
     setTextValue('')
+    setSecondText('')
   }
   const addData = () => {
     if(edit.id){
       const updatedData = {
         ...edit,
         id: edit.id,
-        value: textValue
+        value: textValue,
+        value2: secondText
       }
       const indexEdited = data.findIndex((d) => d.id === edit.id)
       const updatedDataList = [...data]
@@ -48,8 +53,9 @@ const App: () => Node = () => {
       setData(updatedDataList)
       return cancelEditData()
     }
-    setData([...data, {id: makeid(5), value: textValue}])
+    setData([...data, {id: makeid(5), value: textValue, value2: secondText}])
     setTextValue('')
+    setSecondText('')
   }
   const deleteData = (id) => {
     const filteredData = data.filter((d) => d.id !== id)
@@ -70,16 +76,16 @@ const App: () => Node = () => {
 
   return (
     <SafeAreaView>
-      <StatusBar />
       <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <View style={styles.header}>
-          <Text style={styles.headerText}>CRUD on React Native</Text>
-        </View>
         <View style={styles.content}>
-          <Text style={styles.contentText}>Input Anything</Text>
+          <View style={styles.header}>
+            <Text style={styles.headerText}>CRUD on React Native</Text>
+          </View>
+          <Text style={styles.contentText}>Input Anything:</Text>
           <TextInput style={styles.inputText} placeholder="Input Here..." onChangeText={value => setTextValue(value)} value={textValue}/>
+          <TextInput style={styles.inputText} placeholder="Input Here..." onChangeText={value => setSecondText(value)} value={secondText} />
           <View style={styles.input}>
-            <TouchableOpacity style={styles.button} onPress={() => textValue !== '' && addData()}>
+            <TouchableOpacity style={styles.button} onPress={() => textValue !== '' && secondText !== '' && addData()}>
               <Text style={styles.contentText}>{edit.id ? 'Edit' : 'Enter'}</Text>
             </TouchableOpacity>
             {edit.id && (
@@ -91,6 +97,7 @@ const App: () => Node = () => {
           {data.map((d) => (
             <View key={d.id} style={styles.listView}>
               <Text style={styles.listText}>{d.value}</Text>
+              <Text style={styles.listText}>{d.value2}</Text>
               <View style={styles.listAction}>
                 <TouchableOpacity style={styles.button} onPress={()=>editData(d)}>
                   <Text>Edit</Text>
@@ -108,9 +115,14 @@ const App: () => Node = () => {
 };
 
 const styles = StyleSheet.create({
+  img: {
+    width: 100,
+    height: 100,
+    marginTop: 20
+  },  
   header: {
     width: '100%',
-    marginTop: 20
+    marginVertical: 20
   },
   headerText: {
     fontSize: 24,
@@ -118,9 +130,11 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   contentText: {
-    fontSize: 20
+    fontSize: 20,
+    width: '100%'
   },
   listView: {
+    width: '100%',
     borderBottomWidth: 1,
     marginTop: 10,
     paddingBottom: 5,
@@ -147,9 +161,11 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 10,
-    marginTop: 5
+    display: 'flex',
+    alignItems: 'center'
   },
   inputText: {
+    width: '100%',
     borderWidth: 1,
     borderColor: 'black',
     padding: 10,
